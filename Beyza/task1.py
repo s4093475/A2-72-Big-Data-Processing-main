@@ -1,5 +1,5 @@
 # import necessary packages
-from pig.utils import outputSchema
+from pig_util import outputSchema
 from org.apache.pig.data import DataBag, TupleFactory, BagFactory
 
 tupleFactory = TupleFactory.getInstance()

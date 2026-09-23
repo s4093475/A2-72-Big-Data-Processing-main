@@ -1,5 +1,8 @@
 -- Regional Ranking by Country Medal Efficiency
 
+REGISTER '/usr/lib/pig/lib/jython-standalone-2.7.0.jar';
+REGISTER 'task1.py' USING jython AS myudfs;
+
 -- Load and Filter --
 countries_raw = LOAD '/countries.csv' USING PigStorage(',')
     AS (country_code:chararray, country_name:chararray, region:chararray);
@@ -36,8 +39,6 @@ enriched = FOREACH with_population GENERATE
 -- Group per (year, region) for Ranking
 grouped = GROUP enriched BY (year, region);
 
-REGISTER 'task1.py' USING jython AS myudfs;
-
 ranked = FOREACH grouped GENERATE
     FLATTEN(myudfs.rank_countries(enriched))
     AS (year, region, rank_no, country_code, country_name, gold, total_medals, population, medals_per_million);
@@ -45,14 +46,4 @@ ranked = FOREACH grouped GENERATE
 final_output = ORDER ranked BY year ASC, rank_no ASC;
 STORE final_output INTO '/Output/task1' USING PigStorage(',');
 
--- UDF Ranks + Assigns rank_no Within Each Group
-ranked = FOREACH grouped GENERATE udf.rank_group(enriched);
 
--- Flatten, Final Sort & Store
-flattened = FOREACH ranked GENERATE FLATTEN($0);
-
-final_sorted = ORDER flattened BY year ASC, rank_no ASC;
--- flattened schema assumed: year, region, rank_no, country_code, country_name, gold, total_medals, 
--- population, medals_per_million
-
-STORE final_sorted INTO '/Output/task1' USING PigStorage(',');
