@@ -6,7 +6,7 @@ countries_raw = LOAD '/countries.csv' USING PigStorage(',')
     AS (country_code:chararray, country_name:chararray, region:chararray);
 
 -- filter on region before join
-countries_filtered = FILTER countries_raw BY region == $REGION;
+countries_filtered = FILTER countries_raw BY region == '$REGION';
 
 medals_raw = LOAD '/medal_table.csv' USING PigStorage(',')
     AS (year:int, country_code:chararray, gold:int, silver:int, bronze:int);
