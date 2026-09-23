@@ -1,6 +1,4 @@
 -- Regional Ranking by Country Medal Efficiency
-
-REGISTER '/usr/lib/pig/lib/jython-standalone-2.7.0.jar';
 REGISTER 'task1.py' USING jython AS myudfs;
 
 -- Load and Filter --
