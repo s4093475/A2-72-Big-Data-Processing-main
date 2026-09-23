@@ -36,6 +36,15 @@ enriched = FOREACH with_population GENERATE
 -- Group per (year, region) for Ranking
 grouped = GROUP enriched BY (year, region);
 
+REGISTER 'task1.py' USING jython AS myudfs;
+
+ranked = FOREACH grouped GENERATE
+    FLATTEN(myudfs.rank_countries(enriched))
+    AS (year, region, rank_no, country_code, country_name, gold, total_medals, population, medals_per_million);
+
+final_output = ORDER ranked BY year ASC, rank_no ASC;
+STORE final_output INTO '/Output/task1' USING PigStorage(',');
+
 -- UDF Ranks + Assigns rank_no Within Each Group
 ranked = FOREACH grouped GENERATE udf.rank_group(enriched);
 
